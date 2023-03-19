@@ -1,0 +1,5 @@
+-- Use distinct Feature to select all the unique part names that are not finished. 
+
+select distinct part
+from parts_assembly
+WHERE finish_date is NULL
