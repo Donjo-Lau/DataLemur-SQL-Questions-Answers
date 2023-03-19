@@ -1,0 +1,25 @@
+SELECT candidate_id
+FROM candidates
+WHERE skill IN ('Python', 'Tableau', 'PostgreSQL')
+GROUP BY candidate_id
+HAVING COUNT(skill) = 3
+ORDER BY candidate_id;
+
+
+
+
+
+
+/*OR more complex solution*/
+
+SELECT candidate_id
+FROM
+  (SELECT 
+  candidate_id,
+  MIN(CASE WHEN skill = 'Python' then 'Yes' end ) as Python,
+  MIN(CASE WHEN skill = 'Python' then 'Yes' end ) as Tableau,
+  MIN(CASE WHEN skill = 'PostgreSQL' then 'Yes' end) as PostgreSQL
+  FROM candidates
+  GROUP BY candidate_id) as tmp
+WHERE Python = 'Yes' AND Tableau = 'Yes' AND PostgreSQL = 'Yes'
+ORDER BY candidate_id
