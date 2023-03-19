@@ -1,0 +1,14 @@
+--Used FULL OUTER JOIN and filtered for NULL values to find the unliked pages
+
+select p.page_id
+from pages as p  
+FULL OUTER JOIN page_likes as l on p.page_id = l.page_id
+WHERE liked_date is NULL
+ORDER by p.page_id
+
+-- OR use LEFT OUTER JOIN on just the pages with no likes
+select p.page_id
+from pages as p  
+LEFT JOIN page_likes as l on p.page_id = l.page_id
+WHERE liked_date is NULL
+ORDER by p.page_id
