@@ -1,0 +1,14 @@
+/*
+STEP 1: need to join two tables on the column user_id. (you can use LEFT JOIN or INNER JOIN in this instance). LEFT JOIN shows 0 counts for users in this case
+STEP 2: filter data where status = 'Completed' 
+STEP 3: GROUP BY city and count the number of order_ids there are
+STEP 4: ORDER by the COUNT DESC and LIMIT 3 for the TOP 3 cities
+*/
+
+select city, COUNT(order_id) as completed_trades
+from users
+LEFT JOIN trades on users.user_id = trades.user_id
+WHERE status = 'Completed'
+GROUP by city
+ORDER by COUNT(order_id) DESC
+LIMIT 3
