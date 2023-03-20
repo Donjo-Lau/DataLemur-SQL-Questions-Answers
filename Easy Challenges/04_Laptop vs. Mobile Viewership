@@ -1,0 +1,9 @@
+/*
+Using SUM CASE WHEN statements to count the number of times laptop views vs mobile views
+
+*/
+
+select 
+SUM(case when device_type in ('laptop') then 1 else 0 end) as laptop_views, 
+SUM(case when device_type in ('tablet', 'phone') then 1 else 0 end) as mobile_views
+from viewership
