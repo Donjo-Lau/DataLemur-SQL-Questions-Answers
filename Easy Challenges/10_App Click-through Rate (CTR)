@@ -1,0 +1,27 @@
+/*
+Step 1: SUM CASE when statements to get the number of impressions and clicks
+Step 2: GROUP BY statement for app_id since we want to know the number of impressions and clicks for each
+Step 3: when you do SUM CASE WHEN then 1 else 0 -> the output is an INTEGER. we need to convert CTR into a float value so that we get a value with decimals. 
+       This is why we multiply the whole formula by 1.0. 
+        Alternate Option for Step 3: would be to change 1 -> 1.0. This would make postgresql sum the values as floats since its 1.0 which is not integer representation:
+        SUM(case when event_type in ('impression') then 1.0 else 0 end) / SUM(case when event_type in ('click') then 1.0 else 0 end) as CTR
+*/
+
+WITH cte1 as (
+select app_id, 
+SUM(case when event_type in ('click') then 1 else 0 end) AS number_clicks,
+SUM(case when event_type in ('impression') then 1 else 0 end) AS number_impressions,
+1.0*SUM(case when event_type in ('click') then 1 else 0 end) / SUM(case when event_type in ('impression') then 1 else 0 end) as CTR
+from events
+WHERE EXTRACT(year from timestamp) = 2022
+GROUP BY app_id
+)
+
+/*
+Step 4: when we convert the query above to a cte or a temp table, we can now just pull the required columns for the final output:
+Step 5: since we want to show CTR as a percentage instead of a decimal value we need to multiply by 100 and can format the output to 2 decimal points
+*/
+
+select app_id, 
+ROUND(CTR*100, 2) as ctr
+from cte1
