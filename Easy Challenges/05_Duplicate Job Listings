@@ -1,0 +1,24 @@
+/*Step 1: This shows by company_id, and title the number of duplicate postings since COUNT(*)>=2*/
+WITH cte1 as (
+select company_id, title, COUNT(*) as count_duplicate_listings
+from job_listings
+GROUP BY company_id, title
+HAVING COUNT(*)>=2
+)
+
+/*Step 2: using a common table expression (CTE) which is a temporary table, i stored the above table and just pulled the count from it:*/
+select COUNT(count_duplicate_listings) as co_w_duplicate_jobs
+from cte1
+
+/*Final answer (combined):*/
+WITH cte1 as (
+select company_id, title, COUNT(*) as count_duplicate_listings
+from job_listings
+GROUP BY company_id, title
+HAVING COUNT(*)>=2
+)
+select COUNT(count_duplicate_listings) as co_w_duplicate_jobs
+from cte1
+
+
+
