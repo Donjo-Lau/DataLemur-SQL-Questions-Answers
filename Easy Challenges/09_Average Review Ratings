@@ -1,0 +1,12 @@
+/*
+use ROUND function to round numeric value to 2 decimal places for Average
+*/
+
+
+select 
+EXTRACT(month from submit_date) as mth, 
+product_id,
+ROUND(AVG(stars), 2) as avg_stars
+from reviews
+GROUP BY mth, product_id
+ORDER by mth, product_id
