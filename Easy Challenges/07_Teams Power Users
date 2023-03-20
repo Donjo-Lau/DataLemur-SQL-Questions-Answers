@@ -1,0 +1,15 @@
+/*
+Step 1: Use Group by statement to count the number of message_Id by sender_id
+Step 2: WHERE clause specify you want only the messages from the year 2022 and the month of August which is represented as 8
+Step 3: We want to sort the output by the senders with the most messages do COUNT(message_id) DESC
+Step 4: Use LIMIT 2 to specify we only want to output the top 2 results from the above query
+*/
+select sender_id, COUNT(message_id) as message_count
+from messages
+where EXTRACT(year from sent_date) = 2022 AND
+EXTRACT(month from sent_date) = 8
+GROUP BY sender_id
+ORDER by COUNT(message_id) DESC
+LIMIT 2 
+
+
