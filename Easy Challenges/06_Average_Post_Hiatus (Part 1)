@@ -1,0 +1,31 @@
+/*Step 1. create table to show by user_id the first and last posts as well as the number of days between in 2021*/
+WITH cte1 as (
+select 
+user_id, 
+MIN(post_date) as first_post,
+MAX(post_date) as last_post, 
+DATE_PART('day', MAX(post_date) - MIN(post_date)) as Number_of_Days_Between
+from posts
+WHERE EXTRACT(YEAR from post_date) = 2021
+GROUP BY user_id
+)
+
+/*Step 2. pull the relevant columns to match the solution format: */
+SELECT user_id, days_between
+from cte1 
+
+/*Final answer: */
+WITH cte1 as (
+select 
+user_id, 
+MIN(post_date) as first_post,
+MAX(post_date) as last_post, 
+DATE_PART('day', MAX(post_date) - MIN(post_date)) as days_between
+from posts
+WHERE EXTRACT(YEAR from post_date) = 2021
+GROUP BY user_id
+HAVING DATE_PART('day', MAX(post_date) - MIN(post_date)) > 0
+)
+
+SELECT user_id, days_between
+from cte1 
