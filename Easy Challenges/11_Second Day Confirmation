@@ -1,0 +1,33 @@
+/*
+Problem:
+find the number of days difference between signup_date and action_date.
+if the difference is 0 then they signed up the same day, 
+if the difference is 1 then they signed up on the second day and so on.
+
+Step 1:
+merge the two tables via the email_id column. 
+Left Join in this case since we want to show all the useres have signed up even if they haven't confirmed yet. We could do INNER join as well as it would be the same
+
+Step 2: 
+use DatePART 'day' to find the number of days between the action_date and signup date.
+filter for signup_action = 'Confirmed
+This will show for each user when they signed up, the action date and the difference between the two days
+*/
+
+With CTE1 as (
+select user_id, signup_date, action_date,
+DATE_PART('day', action_date - signup_date) as number_of_days
+from emails as e
+LEFT JOIN texts as t on e.email_id = t.email_id
+WHERE signup_action = 'Confirmed'
+)
+
+
+/*
+Step 4: we use WHERE clause to jsut find the rows with number_of_days = 1 which means they signed up in the second day
+Step 5: select the desired columns for output from the cte table. 
+*/
+
+select user_id
+from CTE1
+where number_of_days = 1
