@@ -1,0 +1,16 @@
+/*
+Step 1: use ROW_NUMBER() OVER PARTITION BY as a window function. Here we want to assign row numbers by ascending transaction date for each user_id. 
+We can probably use RANK() as well since the data doesn't have any ties with the transaction date. 
+*/
+WITH cte1 as (
+select user_id, spend, transaction_date,
+ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY transaction_date ASC) as Call_Order
+from transactions
+ORDER BY user_id, CALL_ORDER
+)
+
+-- Step 2: using a CTE, we can filter for where Call_Order = 3 which is the 3rd transaction: 
+
+select user_id, spend, transaction_date
+from cte1
+where CALL_ORDER = 3
