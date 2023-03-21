@@ -1,0 +1,23 @@
+/*Step 1: create a table first showing by user_id, the number of tweets for each day*/
+WITH cte1 as (
+select 
+user_id, 
+DATE(tweet_date) as Just_Date, 
+COUNT(tweet_id) as NUM_TWEETS
+from tweets
+GROUP BY user_id, DATE(tweet_date)
+)
+
+/*
+Step 2: now that we have aggreagated the data to have user_id, tweet_date, and number of tweets per day, we can build a ROLLING average function
+Step 3: we want to use AVG() and the window function to select the current row and the previous 3 for EACH user_id by tweet date
+Example of how to use Rolling average: https://predictivehacks.com/?all-tips=moving-average-in-postgresql 
+*/
+
+select user_id, Just_Date, 
+ROUND(
+  AVG(NUM_TWEETS) OVER 
+  (PARTITION BY user_id ORDER BY Just_Date ASC
+  ROWS BETWEEN 2 preceding and CURRENT ROW)
+, 2) as three_day_rolling_average
+from cte1
