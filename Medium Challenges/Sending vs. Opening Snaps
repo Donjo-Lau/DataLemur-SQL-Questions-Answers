@@ -1,0 +1,28 @@
+/*Step 1:use SUM CASE WHEN statemnts to count the number of sends, opens,and both combined by age bucket
+Step 2:instead of using SUM case when 1 else 0, we replace the 1 value with the column time_spent to pull when activity_type is send we want to sum that time_spent value
+*/
+
+WITH cte1 as (
+select 
+age_bucket, 
+SUM(case when activity_type in ('send') then time_spent else 0 end) as sent, 
+SUM(case when activity_type in ('open') then time_spent else 0 end) as open, 
+SUM(case when activity_type in ('send', 'open') then time_spent else 0 end) as combined
+from activities as a  
+LEFT JOIN age_breakdown as ab on a.user_id = ab.user_id
+GROUP BY age_bucket
+)
+
+/*Step 2:calculate the percentage for each sent_percentage and open_percentage. WE need to multiply by a decimal value to get a more accurate answer instead of rounded integer
+which is why we multiply by 100.0 and then round to decimal points. */
+
+select age_bucket, 
+ROUND(100.0*sent/combined, 2) as send_perc,
+ROUND(100.0*open/combined, 2) as open_perc
+from cte1
+
+
+
+
+
+
