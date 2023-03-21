@@ -1,0 +1,23 @@
+/*
+Step 1: We want to use the group by function to get the total spend for each category and product in the year 2022
+Step 2: We add an additional column using the RANK window function to rank each category/product pairing by the total spend*/
+
+WITH cte1 as (
+select 
+category, 
+product, 
+SUM(spend) as total_spend, 
+RANK() OVER (PARTITION BY category ORDER BY SUM(spend) DESC) as category_rank
+from product_spend
+WHERE EXTRACT(year from transaction_date) = 2022
+GROUP BY category, product
+)
+
+/*
+Step 3: with the aggregated query, we can pull the neccessary columns and filter for any category rank that is labeled as 1 or 2 
+to get the top 2 highest spending category/product pairing
+*/
+
+select category, product, total_spend
+from cte1
+where category_rank in (1,2)
