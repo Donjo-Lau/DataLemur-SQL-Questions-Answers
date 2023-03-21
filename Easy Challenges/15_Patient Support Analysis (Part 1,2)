@@ -1,0 +1,31 @@
+--Part 1:
+/*
+Step 1:  count number of calls for each policy holder and then filter using HAVING clause for more than 3 calls
+Step 2: store the query above as CTE then call for neccesary columns. 
+*/
+
+WITH cte1 as (
+SELECT policy_holder_id, 
+COUNT(case_id) as Number_of_Calls
+from callers
+GROUP BY policy_holder_id
+HAVING COUNT(case_id) >=3
+)
+
+select COUNT(*) as member_count
+from cte1
+
+--Part 2: 
+/*
+Step 1: SUM the times where call_category is Null or n/a as not_categorized and count(case_id) as total_calls
+Step2 : find the percentage by multiplying by 100.0 since you want decimals in your output
+*/
+
+select 
+SUM(case when call_category is NULL or call_category = 'n/a' then 1 else 0 end) as not_categorized, 
+COUNT(case_id) as total_calls, 
+ROUND(
+100.0*
+  SUM(case when call_category is NULL or call_category = 'n/a' then 1 else 0 end) / count(case_id), 
+1) as call_percentage
+from callers
