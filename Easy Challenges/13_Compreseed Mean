@@ -1,0 +1,9 @@
+/*
+Step 1: since columns are integer type, we need to convert them to decimal type so that when we do division we get out the actual output 
+instead of the rounded integer output
+*/
+-- columns are integer type so the division will return an integer
+--cast one of the columns as 'decimal type'
+SELECT 
+ROUND(SUM(item_count::decimal*order_occurrences) / SUM(order_occurrences), 1) as MEAN
+FROM items_per_order
