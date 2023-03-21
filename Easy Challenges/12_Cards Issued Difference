@@ -1,0 +1,17 @@
+/*
+Step 1: for each card name find the minimum and maximum value and the difference for each card
+Step 2: pull the desired information from the cte that was created
+*/
+WITH cte1 as (
+select card_name, 
+MIN(issued_amount) as Minimum, 
+MAX(issued_amount) as Maximum, 
+MAX(issued_amount) - MIN(issued_amount) as difference
+from monthly_cards_issued
+GROUP BY card_name
+ORDER BY difference DESC
+)
+
+select card_name, difference
+from cte1
+ORDER by difference DESC
