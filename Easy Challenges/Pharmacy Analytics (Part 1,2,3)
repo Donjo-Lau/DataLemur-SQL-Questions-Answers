@@ -1,0 +1,27 @@
+--Part 1: 
+/*
+Step 1: Total_Sales - Cost of Goods for each drug by and order by difference to find the profit. LIMIT 3 to show top 3 drugs for profit
+*/
+select drug, 
+SUM(total_sales) - SUM(cogs) as Profit
+from pharmacy_sales
+GROUP BY drug
+ORDER BY Profit DESC
+LIMIT 3
+
+
+--Part 2: 
+
+/*
+Step 1: take the absolute value of the sum of total sales - cost of goods
+Step 2: count the number of drugs that fit where total_sales-cogs is
+Step 2: we filter by total_sales - cogs <= 0, since we only care about non-profitable items
+*/
+
+select manufacturer, 
+COUNT(drug) as drug_count, 
+ABS(SUM(total_sales - cogs)) as total_loss
+from pharmacy_sales
+WHERE total_sales - cogs <= 0
+GROUP BY manufacturer
+ORDER BY total_loss ASC
