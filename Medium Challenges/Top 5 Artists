@@ -1,0 +1,42 @@
+
+/*Step 1:combine all the data tables to pull neccessary info:
+This will show all the top 10 songs for each artist and show what week 
+did they achieve that rank which labeled as the 'day' column. 
+We store this as a CTE table and we'll call it top_10_appearances*/
+
+WITH top_10_appearances as (
+select a.artist_id, artist_name, songs.song_id, day, rank 
+from artists as a
+INNER JOIN songs on a.artist_id = songs.artist_id
+INNER JOIN global_song_rank as gsr on songs.song_id = gsr.song_id
+WHERE rank <= 10
+), 
+
+/*Step 2: Let's now aggregate and count the times each person has been 
+in the top 10 independent of song_id*/
+by_artist_top_10_apperances as (
+select artist_name, 
+COUNT(*) as number_of_top_appearances
+from top_10_appearances
+GROUP BY artist_name
+--ORDER BY number_of_top_appearances DESC
+),
+
+/*Step 3: we now want to rank each artist by their top 10 appearances. 
+If multiple artists have the same number of top appearances than we will
+give them all the same ranking.
+In this case, we will use DENSE_RANK() which is different from regular RANK()
+in that for tie_breakers DENSE_RANK
+*/
+rankings as (
+select artist_name, 
+DENSE_RANK() OVER ( ORDER BY number_of_top_appearances DESC) as artist_rank 
+from by_artist_top_10_apperances
+)
+
+/*Step 4: Select only the top 5 now: */
+select artist_name, artist_rank
+from rankings
+where artist_rank <= 5
+
+
