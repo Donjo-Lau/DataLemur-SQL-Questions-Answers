@@ -1,0 +1,35 @@
+/* Step 1. need to left join because not all people who signed up via email will receive a text. 
+           merged_data shows that some people who signed up have not received a text yet.*/
+
+WITH left_join_merged_data as (
+SELECT e.email_id, user_id, signup_date , text_id, signup_action
+FROM emails as e  
+LEFT JOIN texts as t on e.email_id = t.email_id
+),
+
+/*Step 2: find number of users that have confirmed their account*/
+
+confirmations as (
+SELECT count(*) as confirmed
+FROM emails as e  
+LEFT JOIN texts as t on e.email_id = t.email_id
+WHERE signup_action = 'Confirmed'
+),
+
+/*Step 3: find number of people that have an email with the company. they may not have received a text yet, but they still are 
+          the total of people that have signed up and we might not have sent a text yet. */
+
+all_users_in_emails_table as (
+SELECT count(DISTINCT user_id) as people_signed_up
+FROM emails as e  
+LEFT JOIN texts as t on e.email_id = t.email_id
+)
+
+/*Step 4: Round the percentage all together */
+select 
+ROUND(
+1.0*a.confirmed / b.people_signed_up
+, 2) as confirm_rate
+from confirmations as a,  all_users_in_emails_table as b
+
+
