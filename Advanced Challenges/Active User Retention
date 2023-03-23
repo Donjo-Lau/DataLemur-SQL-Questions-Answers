@@ -1,0 +1,25 @@
+/*1. table showing users that had an action in June or July*/
+with cte1 as (
+SELECT 
+user_id, 
+event_id, 
+event_type,
+event_date, 
+EXTRACT(month from event_date) as month_event
+FROM user_actions
+WHERE EXTRACT(month from event_date) in (6,7)
+),
+
+/*2. create a row_number to and group by month_event , which will show for each user_id if they have an action in consectuvive months where row_number = 2*/
+cte2 as (
+select user_id, month_event, 
+ROW_NUMBER() OVER (PARTITION BY user_id) as multiple_months
+from cte1
+group by user_id, month_event
+)
+
+*/3. count distinct user_ids where the row_number =2 for the current month of July*/
+select month_event, COUNT(DISTINCT user_id) as monthly_active_users
+from cte2
+WHERE month_event = 7 and multiple_months = 2
+GROUP BY month_event
