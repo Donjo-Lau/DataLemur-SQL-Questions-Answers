@@ -1,0 +1,42 @@
+/*Step 1: We need to get information on what country the caller is from and what country the receiver is from, we will do this by using LEFT JOINs
+The first left join we will give the table an alias of caller_id_info and get the country_id column from the phone_info table
+The second left join we will give the table an alias of receiver_id_info and get the country_id column from the phone_info table */
+
+WITH cte1 as (
+select pc.caller_id, caller_id_info.country_id as callers_country,
+pc.receiver_id, receiver_id_info.country_id as receivers_country
+from phone_calls as pc 
+LEFT JOIN phone_info as caller_id_info on pc.caller_id = caller_id_info.caller_id
+LEFT JOIN phone_info as receiver_id_info on pc.receiver_id = receiver_id_info.caller_id
+), 
+
+/*Step 2: I wanted to calculate the number of INTL calls, SAME country Calls, and also the percentage of international calls
+Here we will use SUM CASE when statements where when the callers_country is NOT equal to receiver's country we call that an international call
+and then vice versa for same_country calls. 
+COUNT(*) will get us the number of total calls completed
+We then have to ROUND the number to 1 decimal point and convert it to a float by multiplying by 100.0*/
+
+cte2 as (
+select 
+SUM(case when callers_country <> receivers_country then 1 else 0 end) as INTL_country_calls,
+SUM(case when callers_country = receivers_country then 1 else 0 end) as same_country_calls,
+COUNT(*) as number_of_calls,
+ROUND(100.0*SUM(case when callers_country <> receivers_country then 1 else 0 end) / COUNT(*), 1) as international_calls_pct
+from cte1
+)
+
+/*Step 3: pull the data from the common table expression*/
+select international_calls_pct
+from cte2
+
+
+
+
+
+
+
+
+
+
+
+
