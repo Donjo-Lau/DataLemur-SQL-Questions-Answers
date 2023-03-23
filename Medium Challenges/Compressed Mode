@@ -1,0 +1,28 @@
+/*Step 1: find the ranking for the item_count number depending on the order_occurense, from there we just pull the item_count with a ranking of 1*/
+
+WITH cte1 as (
+select item_count, order_occurrences,
+RANK() OVER (ORDER BY order_occurrences DESC) as ranking
+from items_per_order
+)
+
+select item_count
+from cte1
+where ranking = 1
+
+
+/*OR we could use the MODE() WITHIN GROUP or the MAX(order_occurences) to get the actual value of the item_count and then put that in the WHERE statement*/
+-- Using MAX: we filter on the value outputted by MAX(order_occurences)
+SELECT item_count
+FROM items_per_order
+WHERE order_occurrences = 
+  (SELECT MAX(order_occurrences) FROM items_per_order)
+ORDER BY item_count;
+
+-- Using MODE: we filter on the value outputed by the SELECT subquery statement on the bottom
+SELECT item_count
+FROM items_per_order
+WHERE order_occurrences = 
+  (SELECT MODE() WITHIN GROUP (ORDER BY order_occurrences DESC) 
+  FROM items_per_order)
+ORDER BY item_count;
