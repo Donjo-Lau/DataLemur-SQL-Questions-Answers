@@ -1,4 +1,10 @@
+/*Step 1: table for each advertiser user_id, find the status and amount paid: Find out who pay and did not pay
+create another table for each payment user_id with their status and the amount paid: Find out if there's new paid user
 
+Step 2: Use UNION to combine or stack the two tables together to get both tables information into one: 
+If paid is null, then that user have not paid at day t and if status is null
+then the user is a new user(who's information is not present in advertiser table but that user paid on day t, so this particular user is called as new user)
+*/
 
 with cte1 as (
 SELECT
@@ -8,7 +14,9 @@ SELECT
 FROM advertiser
 LEFT JOIN daily_pay AS payment
   ON advertiser.user_id = payment.user_id
+  
 UNION
+
 SELECT
   payment.user_id,
   advertiser.status,
@@ -18,6 +26,7 @@ LEFT JOIN advertiser
   ON advertiser.user_id = payment.user_id
 )
 
+/*Step 3: use case when statements to break out the actual status depending on certain conditions*/
 SELECT
   user_id,
   CASE WHEN paid IS NULL THEN 'CHURN'
