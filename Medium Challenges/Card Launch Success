@@ -1,0 +1,15 @@
+/*Step 1: Use RANK window function and PARTITION BY card_name to get the ordering of the most recent issued_amount for each card_name.
+IMPORTANT NOTE: we ORDER by issue_year first then issue_month because we want to make sure we get the first issue_year instead of the first_issue_month
+because it could be conflicting if we have Jan 2021, Jan 2022, Jan 2023, we are not specific enough if we ordered by month first.
+When ordering by year first we pick the year 2021, and then we pick the earliest month which is then Jan.*/
+
+WITH cte1 as (
+select card_name, issue_month, issue_year, issued_amount, 
+RANK() OVER (PARTITION BY card_name ORDER BY issue_year, issue_month) as ordering
+from monthly_cards_issued
+)
+
+select card_name, issued_amount
+from cte1
+where ordering = 1
+ORDER by issued_amount DESC
