@@ -1,0 +1,40 @@
+--1. find the sum of square_footage, number of items for each of prime_eligible and non_prime_items
+WITH cte1 as (
+SELECT item_type, 
+COUNT(DISTINCT item_id) as num_items,
+SUM(square_footage) as total_square_footage,
+500000 as warehouse
+FROM inventory
+GROUP BY item_type
+),
+
+--2. get the number of times prime_eligible fits which is 
+--500,000/555.2 sqft which is 900 times with a remainder of 320 sqft
+
+cte2 as (
+select item_type,total_square_footage, num_items, warehouse, 
+FLOOR(warehouse/total_square_footage) as x_prime_items_times, 
+warehouse % total_square_footage as remainder
+from cte1
+WHERE item_type = 'prime_eligible'
+),
+
+--3. now take remainder / not_prime sqft which would be 
+--320/ 128.5
+cte3 as (
+select cte1.item_type, cte1.total_square_footage, cte1.num_items,
+cte2.remainder,
+FLOOR(cte2.remainder/cte1.total_square_footage) as non_prime_items_times
+from cte1, cte2
+WHERE cte1.item_type = 'not_prime'
+)
+
+--4. Combine the two different tables with UNION ALL
+select item_type,
+cte2.num_items*x_prime_items_times as item_count
+FROM cte2
+UNION ALL
+select item_type, 
+cte3.num_items*non_prime_items_times as item_count
+from cte3
+*/
