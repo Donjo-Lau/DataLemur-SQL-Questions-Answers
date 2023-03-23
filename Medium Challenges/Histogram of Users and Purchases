@@ -1,0 +1,42 @@
+/*Step 1: Use First_Value to get the most recent transaction_date. We partition by user_id since we want the first transaction date for each user
+We then order the data to have transaction_date be descending so that we will get the most RECENT date*/
+
+WITH cte1 as (
+select user_id, product_id, spend, transaction_date,
+FIRST_VALUE(transaction_date) OVER (PARTITION BY user_id ORDER BY transaction_date DESC) as first_transaction
+from user_transactions
+ORDER BY user_id, transaction_date
+)
+
+/*Step 2: You then count the number of product-id for each user_id, we also filter for first_transaction = transaction_date to get that 
+most recent transaction information*/
+
+select first_transaction,
+user_id, 
+COUNT(product_id) as purchase_count
+from cte1
+WHERE first_transaction = transaction_date
+GROUP BY first_transaction, user_id
+ORDER BY first_transaction, user_id
+
+
+/*Other: you could use the RANK() function which is probably much cleaner:*/
+
+-- Convert query into a CTE using WITH statement
+WITH latest_transaction AS (
+  SELECT 
+    transaction_date, 
+    user_id, 
+    product_id, 
+    RANK() OVER (PARTITION BY user_id 
+      ORDER BY transaction_date DESC) AS days_rank 
+  FROM user_transactions) 
+  
+SELECT 
+  transaction_date, 
+  user_id,
+  COUNT(product_id) AS purchase_count
+FROM latest_transaction
+WHERE days_rank = 1 
+GROUP BY transaction_date, user_id
+ORDER BY transaction_date;
