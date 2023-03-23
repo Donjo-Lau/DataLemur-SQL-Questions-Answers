@@ -1,0 +1,20 @@
+/*Step 1: find number of unique Distinct categories each customer bought*/
+
+
+with unique_combinations as 
+(SELECT customer_id, 
+COUNT(DISTINCT p.product_category) as unique_categories
+FROM customer_contracts as c   
+LEFT JOIN products as p on c.product_id = p.product_id
+GROUP BY customer_id
+)
+
+/*Step 2: create a subquery to find the maximum DISTINCT product_categories in the dataset. This value will be used to filter for power users
+Step 3: We can then use the WHERE clause to pull for that unique_categories number and find specific customer_id with that number*/
+
+select customer_id
+from unique_combinations
+WHERE unique_categories = 
+  (SELECT COUNT(DISTINCT product_category)
+  FROM products)
+
